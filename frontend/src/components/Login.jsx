@@ -1,10 +1,14 @@
 import React from 'react'
+import { jwtDecode } from "jwt-decode";
 import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc'
 import shareVideo from '../assets/share.mp4'
 import logo from '../assets/logowhite.png'
 
+  const responseGoogle = (response) => {
+    localStorage.setItem('user', JSON.stringify(response.profileObj))
+  }
 
 const Login = () => {
   return (
@@ -28,7 +32,10 @@ const Login = () => {
             <div className="shadow-2xl">
             <GoogleLogin
               onSuccess={credentialResponse => {
-                console.log(credentialResponse);
+                const credentialResponseDecode = jwtDecode(
+                  credentialResponse.credential
+                );
+                console.log(credentialResponseDecode)
               }}
               onError={() => {
                 console.log('Login Failed');
