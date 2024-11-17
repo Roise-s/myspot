@@ -5,12 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc'
 import shareVideo from '../assets/share.mp4'
 import logo from '../assets/logowhite.png'
-
-  const responseGoogle = (response) => {
-    localStorage.setItem('user', JSON.stringify(response.profileObj))
-  }
+import { client } from '../client'
 
 const Login = () => {
+
+  const navigate = useNavigate();
+
   return (
     <div className='flex justify-start items-center flex-col h-screen'>
       <div className="relative w-full h-full">
@@ -35,7 +35,21 @@ const Login = () => {
                 const credentialResponseDecode = jwtDecode(
                   credentialResponse.credential
                 );
-                console.log(credentialResponseDecode)
+                localStorage.setItem('user', JSON.stringify(credentialResponseDecode))
+
+                const { given_name, sub, picture } = credentialResponseDecode
+
+                const doc ={
+                  _id: sub,
+                  _type: 'user',
+                  userName: given_name,
+                  image: picture,
+                }
+
+                client.createIfNotExists(doc)
+                  .then(() => {
+                    navigate('/', { replace: true })
+                  })
               }}
               onError={() => {
                 console.log('Login Failed');
